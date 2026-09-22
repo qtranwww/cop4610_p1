@@ -1,30 +1,51 @@
 #include "lexer.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <limits.h>
 
-int main()
+void print_prompt(void)
 {
-	while (1) {
-		printf("> ");
+    char hostname[256];
+    char cwd[PATH_MAX];
 
-		/* input contains the whole command
-		 * tokens contains substrings from input split by spaces
-		 */
+    char *user = getenv("USER");
 
-		char *input = get_input();
-		printf("whole input: %s\n", input);
+    if (user == NULL)
+        user = "unknown";
 
-		tokenlist *tokens = get_tokens(input);
-		for (int i = 0; i < tokens->size; i++) {
-			printf("token %d: (%s)\n", i, tokens->items[i]);
-		}
+    if (gethostname(hostname, sizeof(hostname)) != 0)
+        strcpy(hostname, "unknown");
 
-		free(input);
-		free_tokens(tokens);
-	}
+    if (getcwd(cwd, sizeof(cwd)) == NULL)
+        strcpy(cwd, "unknown");
 
-	return 0;
+    printf("%s@%s:%s> ", user, hostname, cwd);
+    fflush(stdout);
+}
+
+int main(void)
+{
+    while (1) {
+        print_prompt();
+
+        char *input = get_input();
+
+        printf("whole input: %s\n", input);
+
+        tokenlist *tokens = get_tokens(input);
+
+        for (int i = 0; i < tokens->size; i++) {
+            printf("token %d: (%s)\n", i, tokens->items[i]);
+        }
+
+        free(input);
+        free_tokens(tokens);
+    }
+
+    return 0;
 }
 
 char *get_input(void) {
