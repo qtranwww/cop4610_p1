@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include "lexer.h"
 
 #include <stdio.h>
@@ -36,9 +38,10 @@ int main(void)
         printf("whole input: %s\n", input);
 
         tokenlist *tokens = get_tokens(input);
+		expand_environment_variables(tokens);
 
-        for (int i = 0; i < tokens->size; i++) {
-            printf("token %d: (%s)\n", i, tokens->items[i]);
+        for (size_t i = 0; i < tokens->size; i++) {
+            printf("token %zu: (%s)\n", i, tokens->items[i]);
         }
 
         free(input);
@@ -79,15 +82,19 @@ tokenlist *new_tokenlist(void) {
 	return tokens;
 }
 
-void add_token(tokenlist *tokens, char *item) {
-	int i = tokens->size;
+void add_token(tokenlist *tokens, char *item)
+{
+    size_t i = tokens->size;
 
-	tokens->items = (char **)realloc(tokens->items, (i + 2) * sizeof(char *));
-	tokens->items[i] = (char *)malloc(strlen(item) + 1);
-	tokens->items[i + 1] = NULL;
-	strcpy(tokens->items[i], item);
+    tokens->items =
+        (char **)realloc(tokens->items, (i + 2) * sizeof(char *));
 
-	tokens->size += 1;
+    tokens->items[i] = (char *)malloc(strlen(item) + 1);
+    tokens->items[i + 1] = NULL;
+
+    strcpy(tokens->items[i], item);
+
+    tokens->size += 1;
 }
 
 tokenlist *get_tokens(char *input) {
@@ -104,9 +111,40 @@ tokenlist *get_tokens(char *input) {
 	return tokens;
 }
 
-void free_tokens(tokenlist *tokens) {
-	for (int i = 0; i < tokens->size; i++)
-		free(tokens->items[i]);
-	free(tokens->items);
-	free(tokens);
+void expand_environment_variables(tokenlist *tokens)
+{
+    for (size_t i = 0; i < tokens->size; i++) {
+
+        char *token = tokens->items[i];
+
+        if (token[0] != '$')
+            continue;
+
+        char *name = token + 1;
+        char *value = getenv(name);
+
+        if (value == NULL)
+            value = "";
+
+        char *replacement = malloc(strlen(value) + 1);
+
+        if (replacement == NULL) {
+            perror("malloc");
+            exit(EXIT_FAILURE);
+        }
+
+        strcpy(replacement, value);
+
+        free(tokens->items[i]);
+        tokens->items[i] = replacement;
+    }
+}
+
+void free_tokens(tokenlist *tokens)
+{
+    for (size_t i = 0; i < tokens->size; i++)
+        free(tokens->items[i]);
+
+    free(tokens->items);
+    free(tokens);
 }
