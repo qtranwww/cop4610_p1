@@ -39,6 +39,7 @@ int main(void)
 
         tokenlist *tokens = get_tokens(input);
 		expand_environment_variables(tokens);
+		expand_tilde(tokens);
 
         for (size_t i = 0; i < tokens->size; i++) {
             printf("token %zu: (%s)\n", i, tokens->items[i]);
@@ -147,4 +148,46 @@ void free_tokens(tokenlist *tokens)
 
     free(tokens->items);
     free(tokens);
+}
+
+void expand_tilde(tokenlist *tokens)
+{
+    char *home = getenv("HOME");
+
+    if (home == NULL)
+        return;
+
+    for (size_t i = 0; i < tokens->size; i++) {
+        char *token = tokens->items[i];
+
+        if (strcmp(token, "~") == 0) {
+            char *replacement = malloc(strlen(home) + 1);
+
+            if (replacement == NULL) {
+                perror("malloc");
+                exit(EXIT_FAILURE);
+            }
+
+            strcpy(replacement, home);
+
+            free(tokens->items[i]);
+            tokens->items[i] = replacement;
+        }
+        else if (strncmp(token, "~/", 2) == 0) {
+            size_t length = strlen(home) + strlen(token + 1) + 1;
+
+            char *replacement = malloc(length);
+
+            if (replacement == NULL) {
+                perror("malloc");
+                exit(EXIT_FAILURE);
+            }
+
+            strcpy(replacement, home);
+            strcat(replacement, token + 1);
+
+            free(tokens->items[i]);
+            tokens->items[i] = replacement;
+        }
+    }
 }
