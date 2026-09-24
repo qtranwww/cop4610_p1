@@ -3,6 +3,7 @@
 #include "lexer.h"
 #include "path.h"
 #include "execution.h"
+#include "redirection.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,15 +43,19 @@ int main(void)
         tokenlist *tokens = get_tokens(input);
 		expand_environment_variables(tokens);
 		expand_tilde(tokens);
-        bool command_found = resolve_command_path(tokens);
-
-        if (command_found) {
-            for (size_t i = 0; i < tokens->size; i++) {
-                printf("token %zu: (%s)\n", i, tokens->items[i]);
+        redirection_info redir;
+        init_redirection(&redir);
+        bool redirection_ok = parse_redirection(tokens, &redir);
+        if (redirection_ok && tokens->size > 0) {
+            bool command_found = resolve_command_path(tokens);
+            if (command_found) {
+                for (size_t i = 0; i < tokens->size; i++) {
+                    printf("token %zu: (%s)\n", i, tokens->items[i]);
+                }
+                execute_external_command(tokens, &redir);
             }
-            execute_external_command(tokens);
         }
-
+        free_redirection(&redir);
         free(input);
         free_tokens(tokens);
     }
