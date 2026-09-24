@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "lexer.h"
+#include "path.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,9 +41,12 @@ int main(void)
         tokenlist *tokens = get_tokens(input);
 		expand_environment_variables(tokens);
 		expand_tilde(tokens);
+        bool command_found = resolve_command_path(tokens);
 
-        for (size_t i = 0; i < tokens->size; i++) {
-            printf("token %zu: (%s)\n", i, tokens->items[i]);
+        if (command_found) {
+            for (size_t i = 0; i < tokens->size; i++) {
+                printf("token %zu: (%s)\n", i, tokens->items[i]);
+            }
         }
 
         free(input);
