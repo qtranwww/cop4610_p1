@@ -1,19 +1,39 @@
-#include <unistd.h>
-#include <sys/wait.h>
-#include <stdlib.h>
+#define _POSIX_C_SOURCE 200809L
+
+#include "execution.h"
+
 #include <stdio.h>
-int main() {
-	int status;
-	// what happens if you don't fork? try running execv without it!
-	pid_t pid = fork();
-	if (pid == 0) {
-		char *argv[] = {"/bin/ls", "-l", NULL}; // might have to change /bin/ls based on path, do which ls to find where ls is located.
-		// char *argv[] = {"/bin/sleep", "3", NULL}; // might have to change /bin/sleep based on path, do which sleep to find where sleep is located.
-		execv(argv[0], argv);
-	}
-	else {
-		waitpid(pid, &status, 0);
-		printf("Child Complete\n");
-		exit(0);
-	}
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+
+void execute_external_command(tokenlist *tokens)
+{
+    if (tokens == NULL || tokens->size == 0)
+        return;
+
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        perror("fork");
+        return;
+    }
+
+    if (pid == 0) {
+        execv(tokens->items[0], tokens->items);
+
+        /*
+         * execv only returns if execution failed.
+         */
+        perror("execv");
+        exit(EXIT_FAILURE);
+    }
+
+    int status;
+
+    if (waitpid(pid, &status, 0) < 0) {
+        perror("waitpid");
+    }
 }

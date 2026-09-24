@@ -2,6 +2,7 @@
 
 #include "lexer.h"
 #include "path.h"
+#include "execution.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,6 +48,7 @@ int main(void)
             for (size_t i = 0; i < tokens->size; i++) {
                 printf("token %zu: (%s)\n", i, tokens->items[i]);
             }
+            execute_external_command(tokens);
         }
 
         free(input);
