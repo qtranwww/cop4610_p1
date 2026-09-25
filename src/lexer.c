@@ -4,6 +4,8 @@
 #include "path.h"
 #include "execution.h"
 #include "redirection.h"
+#include "pipeline.h"
+#include "jobs.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,29 +35,60 @@ void print_prompt(void)
 
 int main(void)
 {
+    job_table jobs;
+    jobs_init(&jobs);
+
     while (1) {
         print_prompt();
 
         char *input = get_input();
 
-        printf("whole input: %s\n", input);
+        if (input == NULL) {
+            printf("\n");
+            break;
+        }
 
         tokenlist *tokens = get_tokens(input);
 		expand_environment_variables(tokens);
 		expand_tilde(tokens);
+
+        bool background = extract_background(tokens);
+        char *cmdline = join_tokens(tokens);
+
+        pipeline *pl = split_pipeline(tokens);
+
         redirection_info redir;
         init_redirection(&redir);
-        bool redirection_ok = parse_redirection(tokens, &redir);
-        if (redirection_ok && tokens->size > 0) {
-            bool command_found = resolve_command_path(tokens);
-            if (command_found) {
-                for (size_t i = 0; i < tokens->size; i++) {
-                    printf("token %zu: (%s)\n", i, tokens->items[i]);
+
+        if (pl->count == 1) {
+            tokenlist *cmd = pl->commands[0];
+
+            if (parse_redirection(cmd, &redir) && cmd->size > 0) {
+                if (resolve_command_path(cmd)) {
+                    if (background)
+                        execute_pipeline(pl, &redir, true, &jobs, cmdline);
+                    else
+                        execute_external_command(cmd, &redir);
                 }
-                execute_external_command(tokens, &redir);
             }
         }
+        else {
+            bool all_found = true;
+
+            for (size_t i = 0; i < pl->count; i++) {
+                if (!resolve_command_path(pl->commands[i]))
+                    all_found = false;
+            }
+
+            if (all_found)
+                execute_pipeline(pl, NULL, background, &jobs, cmdline);
+        }
+
+        jobs_check(&jobs);
+
         free_redirection(&redir);
+        free_pipeline(pl);
+        free(cmdline);
         free(input);
         free_tokens(tokens);
     }
@@ -67,8 +100,10 @@ char *get_input(void) {
 	char *buffer = NULL;
 	int bufsize = 0;
 	char line[5];
+	bool got_line = false;
 	while (fgets(line, 5, stdin) != NULL)
 	{
+		got_line = true;
 		int addby = 0;
 		char *newln = strchr(line, '\n');
 		if (newln != NULL)
@@ -81,6 +116,10 @@ char *get_input(void) {
 		if (newln != NULL)
 			break;
 	}
+
+	if (!got_line && feof(stdin))
+		return NULL;
+
 	buffer = (char *)realloc(buffer, bufsize + 1);
 	buffer[bufsize] = 0;
 	return buffer;

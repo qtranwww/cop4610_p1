@@ -11,7 +11,7 @@
 #include <sys/wait.h>
 
 
-static int setup_input_redirection(const char *filename)
+int setup_input_redirection(const char *filename)
 {
     struct stat info;
 
@@ -46,7 +46,7 @@ static int setup_input_redirection(const char *filename)
 }
 
 
-static int setup_output_redirection(const char *filename)
+int setup_output_redirection(const char *filename)
 {
     int fd = open(
         filename,
