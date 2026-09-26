@@ -105,3 +105,58 @@ void jobs_check(job_table *table)
         }
     }
 }
+
+void jobs_print(job_table *table)
+{
+    if (table->count == 0) {
+        printf("no active background jobs\n");
+        return;
+    }
+
+    for (int i = 0; i < table->count; i++) {
+
+        job *j = table->slots[i];
+
+        printf("[%d]+ %d %s\n",
+               j->id,
+               j->pids[j->pid_count - 1],
+               j->cmdline);
+    }
+
+    fflush(stdout);
+}
+
+void jobs_wait(job_table *table)
+{
+    while (table->count > 0) {
+
+        job *j = table->slots[0];
+
+        for (size_t k = 0; k < j->pid_count; k++) {
+
+            if (j->reaped[k])
+                continue;
+
+            int status;
+
+            if (waitpid(
+                    j->pids[k], &status, 0) < 0)
+            {
+
+                perror("waitpid");
+            }
+
+            j->reaped[k] = true;
+        }
+
+        free(j->pids);
+        free(j->reaped);
+        free(j->cmdline);
+        free(j);
+
+        for (int i = 0; i < table->count - 1; i++)
+            table->slots[i] = table->slots[i + 1];
+
+        table->count--;
+    }
+}

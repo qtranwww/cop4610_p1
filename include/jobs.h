@@ -23,3 +23,6 @@ typedef struct {
 void jobs_init(job_table *table);
 void jobs_add(job_table *table, pid_t *pids, size_t pid_count, const char *cmdline);
 void jobs_check(job_table *table);
+
+void jobs_print(job_table *table);
+void jobs_wait(job_table *table);
