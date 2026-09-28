@@ -145,6 +145,7 @@ Each member records their contributions here.
 | Date | Work Completed / Notes |
 |---|---|
 | 2026-09-25 | Piping and background processing (parts 7-8) on the `tyofficer` branch |
+| 2026-09-28 | Bug fixes: history skips failed commands, syntax errors for empty commands, moved `main` to `main.c` |
 
 ### Alexander Turner
 
@@ -156,8 +157,8 @@ Each member records their contributions here.
 
 | Date | Attendees | Topics Discussed | Outcomes / Decisions |
 |---|---|---|---|
-| YYYY-MM-DD | [Names] | [Agenda items] | [Actions/Next steps] |
-| YYYY-MM-DD | [Names] | [Agenda items] | [Actions/Next steps] |
+| 2026-09-13 | Quan Tran, Ty Officer, Alexander Turner | Discussed the project and divided the work | Assigned the parts of the project to members |
+| 2026-09-28 | Quan Tran, Ty Officer, Alexander Turner | Discussed what was needed to wrap up the project | Final bug fixes, README, and submission |
 
 ## Bugs
 
