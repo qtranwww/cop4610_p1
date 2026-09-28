@@ -115,22 +115,22 @@ static void run_pipeline_stage(
     if (redir != NULL) {
         if (in_fd == STDIN_FILENO && redir->input_file != NULL &&
             setup_input_redirection(redir->input_file) != 0) {
-            exit(EXIT_FAILURE);
+            _exit(EXIT_SETUP_FAILED);
         }
 
         if (out_fd == STDOUT_FILENO && redir->output_file != NULL &&
             setup_output_redirection(redir->output_file) != 0) {
-            exit(EXIT_FAILURE);
+            _exit(EXIT_SETUP_FAILED);
         }
     }
 
     execv(cmd->items[0], cmd->items);
 
     perror("execv");
-    exit(EXIT_FAILURE);
+    _exit(EXIT_SETUP_FAILED);
 }
 
-void execute_pipeline(
+bool execute_pipeline(
     pipeline *p,
     redirection_info *redir,
     bool background,
@@ -155,7 +155,7 @@ void execute_pipeline(
         if (has_next && pipe(fds) < 0) {
             perror("pipe");
             free(pids);
-            return;
+            return false;
         }
 
         int out_fd = has_next ? fds[1] : STDOUT_FILENO;
@@ -165,7 +165,7 @@ void execute_pipeline(
         if (pid < 0) {
             perror("fork");
             free(pids);
-            return;
+            return false;
         }
 
         if (pid == 0) {
@@ -186,15 +186,21 @@ void execute_pipeline(
         }
     }
 
+    bool ran = true;
+
     if (background) {
         jobs_add(jobs, pids, n, cmdline);
     }
     else {
         for (size_t i = 0; i < n; i++) {
             int status;
-            waitpid(pids[i], &status, 0);
+
+            if (waitpid(pids[i], &status, 0) > 0 && setup_failed(status))
+                ran = false;
         }
     }
 
     free(pids);
+
+    return ran;
 }

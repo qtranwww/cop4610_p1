@@ -17,7 +17,7 @@ void free_pipeline(pipeline *p);
 bool extract_background(tokenlist *tokens);
 char *join_tokens(tokenlist *tokens);
 
-void execute_pipeline(
+bool execute_pipeline(
     pipeline *p,
     redirection_info *redir,
     bool background,

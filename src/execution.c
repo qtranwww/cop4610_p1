@@ -11,6 +11,12 @@
 #include <sys/wait.h>
 
 
+bool setup_failed(int status)
+{
+    return WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SETUP_FAILED;
+}
+
+
 int setup_input_redirection(const char *filename)
 {
     struct stat info;
@@ -71,18 +77,18 @@ int setup_output_redirection(const char *filename)
 }
 
 
-void execute_external_command(
+bool execute_external_command(
     tokenlist *tokens,
     redirection_info *redir)
 {
     if (tokens == NULL || tokens->size == 0)
-        return;
+        return false;
 
     pid_t pid = fork();
 
     if (pid < 0) {
         perror("fork");
-        return;
+        return false;
     }
 
     if (pid == 0) {
@@ -91,7 +97,7 @@ void execute_external_command(
             if (setup_input_redirection(
                     redir->input_file) != 0) {
 
-                exit(EXIT_FAILURE);
+                _exit(EXIT_SETUP_FAILED);
             }
         }
 
@@ -99,7 +105,7 @@ void execute_external_command(
             if (setup_output_redirection(
                     redir->output_file) != 0) {
 
-                exit(EXIT_FAILURE);
+                _exit(EXIT_SETUP_FAILED);
             }
         }
 
@@ -109,12 +115,15 @@ void execute_external_command(
          * Only reached if execv failed.
          */
         perror("execv");
-        exit(EXIT_FAILURE);
+        _exit(EXIT_SETUP_FAILED);
     }
 
     int status;
 
     if (waitpid(pid, &status, 0) < 0) {
         perror("waitpid");
+        return false;
     }
+
+    return !setup_failed(status);
 }

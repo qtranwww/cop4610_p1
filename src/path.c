@@ -6,7 +6,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
+#include <sys/stat.h>
 
+/* True if path is a regular file the user may execute. */
+static bool is_executable_file(const char *path)
+{
+    struct stat info;
+
+    return stat(path, &info) == 0 && S_ISREG(info.st_mode) &&
+           access(path, X_OK) == 0;
+}
 
 bool resolve_command_path(tokenlist *tokens)
 {
@@ -23,10 +33,14 @@ bool resolve_command_path(tokenlist *tokens)
      *   /usr/bin/ls
      */
     if (strchr(command, '/') != NULL) {
-        if (access(command, F_OK) == 0)
+        if (is_executable_file(command))
             return true;
 
-        fprintf(stderr, "%s: command not found\n", command);
+        if (access(command, F_OK) != 0)
+            fprintf(stderr, "%s: command not found\n", command);
+        else
+            fprintf(stderr, "%s: not an executable file\n", command);
+
         return false;
     }
 
@@ -75,7 +89,7 @@ bool resolve_command_path(tokenlist *tokens)
                  directory,
                  command);
 
-        if (access(candidate, F_OK) == 0) {
+        if (is_executable_file(candidate)) {
             free(tokens->items[0]);
             tokens->items[0] = candidate;
 

@@ -3,51 +3,53 @@
 A Unix-style shell written in C for COP4610. The shell supports command execution, environment variable and tilde expansion, PATH search, I/O redirection, piping, background processing, and built-in commands.
 
 ## Group Members
-- **[Member]**: [School Email]
-- **[Member]**: [School Email]
-- **[Member]**: [School Email]
+**Group Number**: 34
+
+- Quan Tran
+- Ty Officer
+- Alexander Turner
 
 ## Division of Labor
 
 ### Part 1: Prompt
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Print the `USER@MACHINE:PWD>` prompt.
+- **Assigned to**: Quan Tran, Alexander Turner
 
 ### Part 2: Environment Variables
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Expand whole-token `$VAR` arguments.
+- **Assigned to**: Quan Tran, Alexander Turner
 
 ### Part 3: Tilde Expansion
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Expand standalone `~` and leading `~/`.
+- **Assigned to**: Quan Tran, Alexander Turner
 
 ### Part 4: PATH Search
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Search `$PATH` for commands without a slash.
+- **Assigned to**: Quan Tran, Ty Officer
 
 ### Part 5: External Command Execution
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Run external commands with `fork()` and `execv()`.
+- **Assigned to**: Quan Tran, Ty Officer
 
 ### Part 6: I/O Redirection
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Handle `<` and `>` with the required file permissions.
+- **Assigned to**: Quan Tran, Ty Officer
 
 ### Part 7: Piping
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Connect commands with pipes.
+- **Assigned to**: Ty Officer, Alexander Turner
 
 ### Part 8: Background Processing
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Run jobs with `&`, track job numbers and report completion.
+- **Assigned to**: Ty Officer, Alexander Turner
 
 ### Part 9: Internal Command Execution
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Implement the `exit`, `cd` and `jobs` built-ins.
+- **Assigned to**: Alexander Turner, Ty Officer
 
 ### Extra Credit
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Unlimited pipes, piping with I/O redirection and shell-ception.
+- **Assigned to**: Alexander Turner, Ty Officer
 
 ### C Project Structure
 
@@ -71,6 +73,7 @@ root/
 │   ├── execution.c
 │   ├── jobs.c
 │   ├── lexer.c
+│   ├── main.c
 │   ├── path.c
 │   ├── pipeline.c
 │   └── redirection.c
@@ -128,26 +131,26 @@ make clean
 
 Each member records their contributions here.
 
-### [Member 1]
+### Quan Tran
 
 | Date | Work Completed / Notes |
 |---|---|
-| YYYY-MM-DD | [Description of task] |
-| YYYY-MM-DD | [Description of task] |
+| 2026-09-22 | Added the provided starter code; implemented the prompt (part 1) |
+| 2026-09-23 | Environment variable expansion (part 2), tilde expansion (part 3), PATH search (part 4), external command execution (part 5) |
+| 2026-09-24 | I/O redirection (part 6) |
+| 2026-09-28 | Fixed redirection handling in pipelines (`<` `>` `\|`); first draft of the README |
 
-### [Member 2]
-
-| Date | Work Completed / Notes |
-|---|---|
-| YYYY-MM-DD | [Description of task] |
-| YYYY-MM-DD | [Description of task] |
-
-### [Member 3]
+### Ty Officer
 
 | Date | Work Completed / Notes |
 |---|---|
-| YYYY-MM-DD | [Description of task] |
-| YYYY-MM-DD | [Description of task] |
+| 2026-09-25 | Piping and background processing (parts 7-8) on the `tyofficer` branch |
+
+### Alexander Turner
+
+| Date | Work Completed / Notes |
+|---|---|
+| 2026-09-26 | Internal commands: `exit`, `cd`, `jobs` (part 9); merged the `tyofficer` branch; removed object and program files from the repo |
 
 ## Meetings
 
