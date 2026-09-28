@@ -231,6 +231,12 @@ int main(void)
             bool all_found = true;
 
             for (size_t i = 0; i < pl->count; i++) {
+                if (!parse_redirection(pl->commands[i], &redir) ||
+                    pl->commands[i]->size == 0) {
+                    all_found = false;
+                    continue;
+                }
+
                 if (!resolve_command_path(
                         pl->commands[i])) {
 
@@ -242,7 +248,7 @@ int main(void)
 
                 execute_pipeline(
                     pl,
-                    NULL,
+                    &redir,
                     background,
                     &jobs,
                     cmdline
@@ -323,17 +329,41 @@ void add_token(tokenlist *tokens, char *item)
 }
 
 tokenlist *get_tokens(char *input) {
-	char *buf = (char *)malloc(strlen(input) + 1);
-	strcpy(buf, input);
-	tokenlist *tokens = new_tokenlist();
-	char *tok = strtok(buf, " ");
-	while (tok != NULL)
-	{
-		add_token(tokens, tok);
-		tok = strtok(NULL, " ");
-	}
-	free(buf);
-	return tokens;
+    tokenlist *tokens = new_tokenlist();
+    size_t i = 0;
+
+    while (input[i] != '\0') {
+        while (input[i] == ' ' || input[i] == '\t' || input[i] == '\n')
+            i++;
+        if (input[i] == '\0')
+            break;
+
+        if (input[i] == '|' || input[i] == '<' || input[i] == '>') {
+            char operator[2] = { input[i], '\0' };
+            add_token(tokens, operator);
+            i++;
+            continue;
+        }
+
+        size_t start = i;
+        while (input[i] != '\0' && input[i] != ' ' && input[i] != '\t' &&
+               input[i] != '\n' && input[i] != '|' && input[i] != '<' &&
+               input[i] != '>')
+            i++;
+
+        size_t length = i - start;
+        char *word = malloc(length + 1);
+        if (word == NULL) {
+            perror("malloc");
+            exit(EXIT_FAILURE);
+        }
+        memcpy(word, input + start, length);
+        word[length] = '\0';
+        add_token(tokens, word);
+        free(word);
+    }
+
+    return tokens;
 }
 
 void expand_environment_variables(tokenlist *tokens)

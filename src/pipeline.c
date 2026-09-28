@@ -113,12 +113,12 @@ static void run_pipeline_stage(
     }
 
     if (redir != NULL) {
-        if (redir->input_file != NULL &&
+        if (in_fd == STDIN_FILENO && redir->input_file != NULL &&
             setup_input_redirection(redir->input_file) != 0) {
             exit(EXIT_FAILURE);
         }
 
-        if (redir->output_file != NULL &&
+        if (out_fd == STDOUT_FILENO && redir->output_file != NULL &&
             setup_output_redirection(redir->output_file) != 0) {
             exit(EXIT_FAILURE);
         }
