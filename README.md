@@ -3,51 +3,47 @@
 A Unix-style shell written in C for COP4610. The shell supports command execution, environment variable and tilde expansion, PATH search, I/O redirection, piping, background processing, and built-in commands.
 
 ## Group Members
-- **[Member]**: [School Email]
-- **[Member]**: [School Email]
-- **[Member]**: [School Email]
+- **Quan Tran**: qt24b@fsu.edu
+- **Ty Officer**: tro23@fsu.edu
+- **Alexander Turner**: ajt22g@fsu.edu
 
 ## Division of Labor
 
 ### Part 1: Prompt
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Handles displaying shell prompt with current user, machine name, and working directory
+- **Assigned to**: Quan, Alex
 
 ### Part 2: Environment Variables
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Handles expanding environment variables into corresponding values within command tokens
+- **Assigned to**: Quan, Alex
 
 ### Part 3: Tilde Expansion
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Handles exapnding ~ and ~/ paths to user's home directory
+- **Assigned to**: Quan, Alex
 
 ### Part 4: PATH Search
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Handles locating extenal commands by searching through directories in $PATH environment variable
+- **Assigned to**: Quan, Ty
 
 ### Part 5: External Command Execution
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Handles creation of child processes and external command execution
+- **Assigned to**: Quan, Ty
 
 ### Part 6: I/O Redirection
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Handles redirecting standard input and output between commands and files.
+- **Assigned to**: Quan, Ty
 
 ### Part 7: Piping
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Handles connecting multiple commands through pipes so that output of one command is input of the next.
+- **Assigned to**: Ty, Alex
 
 ### Part 8: Background Processing
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Handles executing commands and pipelines in the background while tracking job numbers, process IDs, and completion status
+- **Assigned to**: Ty, Alex
 
 ### Part 9: Internal Command Execution
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
-
-### Extra Credit
-- **Responsibilities**: [Description]
-- **Assigned to**: [Members]
+- **Responsibilities**: Handles built-in shell commands such as cd, exit, and jobs, with command history and background process management
+- **Assigned to**: Ty, Alex
 
 ### C Project Structure
 
@@ -60,8 +56,6 @@ root/
 ├── Makefile
 └── README.md
 ```
-
-If you are programming in C, you must include a makefile to compile your project.
 
 ## File Listing
 
@@ -124,49 +118,11 @@ or:
 make clean
 ```
 
-## Development Log
-
-Each member records their contributions here.
-
-### [Member 1]
-
-| Date | Work Completed / Notes |
-|---|---|
-| YYYY-MM-DD | [Description of task] |
-| YYYY-MM-DD | [Description of task] |
-
-### [Member 2]
-
-| Date | Work Completed / Notes |
-|---|---|
-| YYYY-MM-DD | [Description of task] |
-| YYYY-MM-DD | [Description of task] |
-
-### [Member 3]
-
-| Date | Work Completed / Notes |
-|---|---|
-| YYYY-MM-DD | [Description of task] |
-| YYYY-MM-DD | [Description of task] |
-
-## Meetings
-
-| Date | Attendees | Topics Discussed | Outcomes / Decisions |
-|---|---|---|---|
-| YYYY-MM-DD | [Names] | [Agenda items] | [Actions/Next steps] |
-| YYYY-MM-DD | [Names] | [Agenda items] | [Actions/Next steps] |
-
 ## Bugs
 
 - No known major bugs at the time of submission.
 - Quote handling, glob expansion, escaped characters, and autocomplete are not implemented because they are outside the project requirements.
 - Background process output may appear after the prompt because background processes and the shell share the same terminal output.
-
-## Extra Credit
-
-- **Unlimited piping**: Supports more than two pipe operators in one command.
-- **Piping with I/O redirection**: Supports commands that combine pipes with `<` and `>`.
-- **Shell-ception**: Supports starting another shell instance from within the shell.
 
 ## Considerations
 
@@ -267,21 +223,3 @@ AI was also used in a limited capacity to help explain unexpected test results. 
 | `jobs` with no active jobs | Reports no active background jobs |
 | `sleep 5 &` then `exit` | Waits for the background job before exiting |
 | More than three valid commands then `exit` | Prints only the last three valid commands |
-
-### Extra Credit
-
-| Test Case | Expected Result |
-|---|---|
-| `echo hello \| cat \| cat \| cat \| wc -c` | Prints `6` |
-| `seq 10000 \| sort \| uniq \| wc -l` | Prints `10000` |
-| `cat < input.txt \| sort > output.txt` | Stores sorted input in `output.txt` |
-| `./bin/shell` | Starts a nested shell |
-| `exit` inside nested shell | Returns to the parent shell |
-
-### Additional Validation
-
-| Test Case | Expected Result |
-|---|---|
-| Run with `valgrind --leak-check=full` | No memory leaks or invalid memory access |
-| Check background jobs using `ps` | No persistent zombie processes |
-| `make clean` followed by `make` | Project compiles successfully |
