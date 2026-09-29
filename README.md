@@ -1,6 +1,6 @@
-# Shell Project
+# COP4610_Project 1
 
-A Unix-style shell written in C for COP4610. The shell supports command execution, environment variable and tilde expansion, PATH search, I/O redirection, piping, background processing, and built-in commands.
+A Unix-style shell written in C. The shell supports command execution, environment variable and tilde expansion, PATH search, I/O redirection, piping, background processing, and built-in commands.
 
 ## Group Members
 - **Quan Tran**: qt24b@fsu.edu
@@ -43,6 +43,10 @@ A Unix-style shell written in C for COP4610. The shell supports command executio
 
 ### Part 9: Internal Command Execution
 - **Responsibilities**: Handles built-in shell commands such as cd, exit, and jobs, with command history and background process management
+- **Assigned to**: Ty, Alex
+
+### Extra Credit
+- **Responsibilities**: Handles unlimited pipes, piping with I/O redirection in the same command, and shell-ception.
 - **Assigned to**: Ty, Alex
 
 ### C Project Structure
@@ -123,6 +127,12 @@ make clean
 - No known major bugs at the time of submission.
 - Quote handling, glob expansion, escaped characters, and autocomplete are not implemented because they are outside the project requirements.
 - Background process output may appear after the prompt because background processes and the shell share the same terminal output.
+
+## Extra Credit
+
+- **Unlimited piping**: Supports more than two pipe operators in one command.
+- **Piping with I/O redirection**: Supports commands that combine pipes with `<` and `>`.
+- **Shell-ception**: Supports starting another shell instance from within the shell.
 
 ## Considerations
 
@@ -223,3 +233,13 @@ AI was also used in a limited capacity to help explain unexpected test results. 
 | `jobs` with no active jobs | Reports no active background jobs |
 | `sleep 5 &` then `exit` | Waits for the background job before exiting |
 | More than three valid commands then `exit` | Prints only the last three valid commands |
+
+### Extra Credit
+
+| Test Case | Expected Result |
+|---|---|
+| `echo hello \| cat \| cat \| cat \| wc -c` | Prints `6` |
+| `seq 10000 \| sort \| uniq \| wc -l` | Prints `10000` |
+| `cat < input.txt \| sort > output.txt` | Stores sorted input in `output.txt` |
+| `./bin/shell` | Starts a nested shell |
+| `exit` inside nested shell | Returns to the parent shell |
